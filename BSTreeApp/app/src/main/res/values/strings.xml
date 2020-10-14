@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">BSTreeApp</string>
+
+    <string name="create_tree">Create Tree</string>
+    <string name="add_tree">Add to tree</string>
+    <string name="remove_tree">Remove</string>
+    <string name="empty_tree">[Empty tree]</string>
+
+    <string-array name="remove_type">
+        <item>Color</item>
+        <item>Value</item>
+    </string-array>
+
+</resources>
