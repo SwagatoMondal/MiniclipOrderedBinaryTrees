@@ -12,7 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.miniclip.bstree.entity.BSTree;
-import com.miniclip.bstree.util.DialogUtil;
+import com.miniclip.bstree.util.dialogs.DialogListener;
+import com.miniclip.bstree.util.dialogs.DialogUtil;
+import com.miniclip.bstree.util.dialogs.RemoveDialogUtil;
 import com.miniclip.bstree.util.JSONParser;
 import com.miniclip.bstree.util.TreeViewBuilder;
 
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BSTree tree;
     private TextView empty;
     private LinearLayout container;
-    private DialogUtil util;
+    private RemoveDialogUtil util;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @NonNull
-    private DialogUtil.DialogListener getValueListener() {
-        return new DialogUtil.DialogListener() {
+    private DialogListener getValueListener() {
+        return new DialogListener() {
 
             private CharSequence[] items;
 
@@ -152,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @NonNull
-    private DialogUtil.DialogListener getColorListener() {
-        return new DialogUtil.DialogListener() {
+    private DialogListener getColorListener() {
+        return new DialogListener() {
 
             private CharSequence[] items;
 
@@ -181,16 +183,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
     }
 
+    private DialogListener getFileChooserListener(final boolean create) {
+        return new DialogListener() {
+            @Override
+            public CharSequence[] getItems() {
+                return new String[]{"Input 1", "Input 2", "Input 3", "Input 4", "Input 5"};
+            }
+
+            @Override
+            public void onSelected(int item) {
+                int id;
+                switch (item) {
+                    default:
+                    case 0:
+                        id = R.raw.input1;
+                        break;
+                    case 1:
+                        id = R.raw.input2;
+                        break;
+                    case 2:
+                        id = R.raw.input3;
+                        break;
+                    case 3:
+                        id = R.raw.input4;
+                        break;
+                    case 4:
+                        id = R.raw.input5;
+                        break;
+                }
+
+                if (create) {
+                    tree = createTree(new JSONParser(getRawJSON(id)));
+                } else {
+                    addNodes(tree, new JSONParser(getRawJSON(id)));
+                }
+                showTreeStatus();
+            }
+        };
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.create:
-                tree = createTree(new JSONParser(getRawJSON(R.raw.input1)));
-                showTreeStatus();
+                DialogUtil.fileChooser(this, getFileChooserListener(true));
                 break;
             case R.id.add:
-                addNodes(tree, new JSONParser(getRawJSON(R.raw.input2)));
-                showTreeStatus();
+                DialogUtil.fileChooser(this, getFileChooserListener(false));
                 break;
             case R.id.remove:
                 if (null == tree) {
@@ -199,13 +238,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
 
-                util = new DialogUtil(this, getColorListener(), getValueListener());
+                util = new RemoveDialogUtil(this, getColorListener(), getValueListener());
                 util.show();
                 break;
             case R.id.state:
-                final JSONArray state = getState(tree);
-                Log.d(TAG, "Current State : " + state.toString());
-                Toast.makeText(this, "Please check logs", Toast.LENGTH_SHORT).show();
+                if (tree != null) {
+                    final JSONArray state = getState(tree);
+                    Log.d(TAG, "Current State : " + state.toString());
+                    Toast.makeText(this, "Please check logs", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Create a tree first to continue",
+                            Toast.LENGTH_SHORT).show();
+                }
         }
     }
 }

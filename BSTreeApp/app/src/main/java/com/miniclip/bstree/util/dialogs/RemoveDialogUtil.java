@@ -1,19 +1,14 @@
-package com.miniclip.bstree.util;
+package com.miniclip.bstree.util.dialogs;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.view.Gravity;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.miniclip.bstree.R;
-import com.miniclip.bstree.entity.BSTree;
-import com.miniclip.bstree.view.Node;
 
-public class DialogUtil {
+public class RemoveDialogUtil {
 
     @NonNull
     private final Activity activity;
@@ -22,8 +17,8 @@ public class DialogUtil {
     @NonNull
     private DialogListener val_listener;
 
-    public DialogUtil(@NonNull Activity activity, @NonNull DialogListener color_listener,
-                      @NonNull DialogListener val_listener) {
+    public RemoveDialogUtil(@NonNull Activity activity, @NonNull DialogListener color_listener,
+                            @NonNull DialogListener val_listener) {
         this.activity = activity;
         this.color_listener = color_listener;
         this.val_listener = val_listener;
@@ -70,23 +65,5 @@ public class DialogUtil {
                 val_listener.onSelected(which);
             }
         }, val_listener.getItems());
-    }
-
-    static void showTreeDialog(@NonNull Context context, @NonNull BSTree node) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        // Node view
-        final Node view = new Node(context, node);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(100, 100);
-        params.gravity = Gravity.CENTER_HORIZONTAL;
-        view.setLayoutParams(params);
-
-        builder.setView(view);
-        builder.show();
-    }
-
-    public interface DialogListener {
-        CharSequence[] getItems();
-        void onSelected(int item);
     }
 }
