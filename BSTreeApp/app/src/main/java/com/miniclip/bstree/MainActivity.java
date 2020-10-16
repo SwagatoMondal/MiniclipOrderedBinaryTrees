@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.create).setOnClickListener(this);
         findViewById(R.id.add).setOnClickListener(this);
         findViewById(R.id.remove).setOnClickListener(this);
+        findViewById(R.id.state).setOnClickListener(this);
     }
 
     @NonNull
@@ -77,10 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private BSTree currentState() {
-        return tree;
-    }
-
     /**
      * Method to create a BSTree.
      * @param parser A {@link JSONParser} object to read the values from JSONArray
@@ -99,15 +96,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Method to remove node(s) with particular value from the tree
      * @param tree Root of the tree
      * @param value Value of the nodes to be removed
+     * @return the new root
      */
-    public native void removeValue(BSTree tree, int value);
+    public native BSTree removeValue(BSTree tree, int value);
 
     /**
      * Method to remove nodes(s) with particular color from the tree
      * @param tree Root of the tree
      * @param color Color of the nodes to be removed
+     * @return  the new root
      */
-    public native void removeColor(BSTree tree, String color);
+    public native BSTree removeColor(BSTree tree, String color);
+
+    public native JSONArray getState(BSTree tree);
 
     private void showTreeStatus() {
         container.removeAllViews();
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onSelected(int which) {
                 final int valueToRemove = Integer.parseInt(items[which].toString());
                 Log.d(TAG, "Value to be removed : " + valueToRemove);
-                removeValue(tree, valueToRemove);
+                tree = removeValue(tree, valueToRemove);
                 showTreeStatus();
             }
         };
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onSelected(int which) {
                 final String colorToRemove = items[which].toString();
                 Log.d(TAG, "Color to be removed : " + colorToRemove);
-                removeColor(tree, colorToRemove);
+                tree = removeColor(tree, colorToRemove);
                 showTreeStatus();
             }
         };
@@ -201,6 +202,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 util = new DialogUtil(this, getColorListener(), getValueListener());
                 util.show();
                 break;
+            case R.id.state:
+                final JSONArray state = getState(tree);
+                Log.d(TAG, "Current State : " + state.toString());
+                Toast.makeText(this, "Please check logs", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">BSTreeApp</string>
 
-    <string name="create_tree">Create Tree</string>
-    <string name="add_tree">Add to tree</string>
+    <string name="inorder">Inorder traversal</string>
+    <string name="create_tree">Create</string>
+    <string name="add_tree">Add</string>
     <string name="remove_tree">Remove</string>
+    <string name="state_tree">State</string>
     <string name="empty_tree">[Empty tree]</string>
 
     <string-array name="remove_type">

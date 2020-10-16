@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:weightSum="3">
+        android:weightSum="4">
 
         <Button
             android:id="@+id/create"
@@ -39,6 +39,14 @@
         <Button
             android:id="@+id/remove"
             android:text="@string/remove_tree"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/state"
+            android:text="@string/state_tree"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="50dp"
