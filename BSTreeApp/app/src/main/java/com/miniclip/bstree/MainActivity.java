@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             empty.setVisibility(View.GONE);
             TreeViewBuilder.viewBuilder(this, tree, container);
+            container.setVisibility(View.VISIBLE);
         }
     }
 

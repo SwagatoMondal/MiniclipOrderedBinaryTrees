@@ -186,35 +186,29 @@ bool compareString(jstring str1, jstring str2, JNIEnv* env) {
     return (env)->CallBooleanMethod(str1, mID, str2);
 }
 
-jobject removeColor(jobject root, jstring color, JNIEnv* env) {
-    if (nullptr == root) return root;
+jobject removeColor(jobject root, jobject node, jstring color, JNIEnv* env) {
+    if (nullptr == node) return node;
 
-    __android_log_print(ANDROID_LOG_ERROR, "Native-lib", "Remove color start");
-    jstring root_color = (jstring) env->CallObjectMethod(root, tree_color);
-    jobject left = env->CallObjectMethod(root, tree_get_left);
-    jobject right = env->CallObjectMethod(root, tree_get_right);
-
-    removeColor(left, color, env);
-    removeColor(right, color, env);
+    int root_val = env->CallIntMethod(node, tree_value);
+    jstring root_color = (jstring) env->CallObjectMethod(node, tree_color);
+    jobject left = env->CallObjectMethod(node, tree_get_left);
+    jobject right = env->CallObjectMethod(node, tree_get_right);
 
     // Color match found
-    __android_log_print(ANDROID_LOG_ERROR, "Native-lib", "Remove color before color match");
-    if (compareString(color, root_color, env)) {
-        __android_log_print(ANDROID_LOG_ERROR, "Native-lib", "Remove color inside color match");
-        if (nullptr == left) {
-            return right;
-        } else if (nullptr == right) {
-            return left;
+    while (compareString(color, root_color, env)) {
+        root = removeVal(root, root_val, env);
+
+        if (root != nullptr) {
+            root_color = (jstring) env->CallObjectMethod(root, tree_color);
+            root_val = env->CallIntMethod(root, tree_value);
         } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Native-lib", "Remove color inside color match else");
-            jobject minVal = minValue(right, env);
-            env->CallVoidMethod(root, tree_update, minVal);
-            jstring inorder_color = (jstring) env->CallObjectMethod(minVal, tree_color);
-            jobject node = removeColor(right, inorder_color, env);
-            env->CallVoidMethod(root, tree_set_right, node);
+            root_color = env->NewStringUTF("");
         }
     }
-    __android_log_print(ANDROID_LOG_ERROR, "Native-lib", "Remove color after color match");
+
+    removeColor(root, left, color, env);
+    removeColor(root, right, color, env);
+
     return root;
 }
 
@@ -247,7 +241,7 @@ Java_com_miniclip_bstree_MainActivity_removeColor(
         jstring color) {
     init(env);
     __android_log_print(ANDROID_LOG_DEBUG, "Native-lib", "Remove color called");
-    return removeColor(tree, color, env);
+    return removeColor(tree, tree, color, env);
 }
 
 void statePopulation(JNIEnv* env, jobject root, jobject state, jmethodID put) {
