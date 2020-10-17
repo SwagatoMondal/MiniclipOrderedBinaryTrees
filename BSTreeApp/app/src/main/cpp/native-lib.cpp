@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-use-auto"
 #include <jni.h>
 #include <string>
 #include <android/log.h>
@@ -289,3 +291,5 @@ Java_com_miniclip_bstree_MainActivity_getState(
 
     return state;
 }
+
+#pragma clang diagnostic pop

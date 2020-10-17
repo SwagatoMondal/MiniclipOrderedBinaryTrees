@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.add).setOnClickListener(this);
         findViewById(R.id.remove).setOnClickListener(this);
         findViewById(R.id.state).setOnClickListener(this);
-
-        getTreeHeight();
     }
 
     @Override
@@ -94,19 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void getTreeHeight() {
-        final ViewTreeObserver vto = treeView.getViewTreeObserver();
-        if (vto.isAlive()) {
-            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    treeView.setHeight(treeView.getMeasuredHeight());
-                    if (vto.isAlive()) vto.removeOnGlobalLayoutListener(this);
-                }
-            });
         }
     }
 
