@@ -36,6 +36,11 @@ contains an activity named `MainActivity` and gives user the capability to perfo
 As soon as the app launches, the buttons will appear at the bottom of the screen and the user can perform the actions
 by pressing the required button.
 
+You can also view the rendered tree in 2 ways :
+1. Inorder (Click on any node to see it and it's child nodes)
+2. Tree View (Typical tree view)
+This can be achieved by using the menu.
+
 ### Create and Add
 The create and add options allows you to choose from 5 raw files already available in the app. Please choose a file
 in order to complete the operation. Note the files are already pre-loaded with some values, please change or update
