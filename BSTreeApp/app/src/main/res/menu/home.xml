@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/clear"
+        android:title="Clear"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/inorder"
+        android:title="Inorder View"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/tree"
+        android:title="Tree View"
+        app:showAsAction="never"/>
+</menu>

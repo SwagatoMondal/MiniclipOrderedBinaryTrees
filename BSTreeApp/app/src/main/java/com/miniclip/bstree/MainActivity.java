@@ -6,17 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.miniclip.bstree.entity.BSTree;
+import com.miniclip.bstree.util.TreeViewBuilder;
 import com.miniclip.bstree.util.dialogs.DialogListener;
 import com.miniclip.bstree.util.dialogs.DialogUtil;
 import com.miniclip.bstree.util.dialogs.RemoveDialogUtil;
 import com.miniclip.bstree.util.JSONParser;
-import com.miniclip.bstree.util.TreeViewBuilder;
+import com.miniclip.bstree.view.NodeView;
 
 import org.json.JSONArray;
 
@@ -42,7 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BSTree tree;
     private TextView empty;
     private LinearLayout container;
+    private NodeView treeView;
     private RemoveDialogUtil util;
+    private boolean treeViewSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +56,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         empty = findViewById(R.id.empty);
+        treeView = findViewById(R.id.tree);
         container = findViewById(R.id.container);
 
         findViewById(R.id.create).setOnClickListener(this);
         findViewById(R.id.add).setOnClickListener(this);
         findViewById(R.id.remove).setOnClickListener(this);
         findViewById(R.id.state).setOnClickListener(this);
+
+        getTreeHeight();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear:
+                tree = null;
+                showTreeStatus();
+                return true;
+            case R.id.inorder:
+                if (treeViewSelected) {
+                    treeViewSelected = false;
+                    showTreeStatus();
+                }
+                return true;
+            case R.id.tree:
+                if (!treeViewSelected) {
+                    treeViewSelected = true;
+                    showTreeStatus();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void getTreeHeight() {
+        final ViewTreeObserver vto = treeView.getViewTreeObserver();
+        if (vto.isAlive()) {
+            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    treeView.setHeight(treeView.getMeasuredHeight());
+                    if (vto.isAlive()) vto.removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
     }
 
     @NonNull
@@ -113,14 +165,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public native JSONArray getState(BSTree tree);
 
     private void showTreeStatus() {
-        container.removeAllViews();
         if (null == tree) {
             empty.setVisibility(View.VISIBLE);
+            treeView.setVisibility(View.GONE);
             container.setVisibility(View.GONE);
         } else {
             empty.setVisibility(View.GONE);
-            TreeViewBuilder.viewBuilder(this, tree, container);
-            container.setVisibility(View.VISIBLE);
+            if (treeViewSelected) {
+                container.setVisibility(View.GONE);
+                treeView.setTree(tree);
+                treeView.invalidate();
+                treeView.setVisibility(View.VISIBLE);
+            } else {
+                treeView.setVisibility(View.GONE);
+                container.removeAllViews();
+                TreeViewBuilder.viewBuilder(this, tree, container);
+                container.setVisibility(View.VISIBLE);
+            }
         }
     }
 

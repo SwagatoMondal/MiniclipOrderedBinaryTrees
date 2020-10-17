@@ -54,6 +54,12 @@
 
     </LinearLayout>
 
+    <com.miniclip.bstree.view.NodeView
+        android:id="@+id/tree"
+        android:layout_above="@id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <ScrollView
         android:layout_above="@id/buttons"
         android:layout_width="match_parent"
