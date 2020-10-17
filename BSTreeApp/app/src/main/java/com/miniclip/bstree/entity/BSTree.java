@@ -9,9 +9,9 @@ import java.util.HashSet;
  * Class to represent a node in the Binary Search Tree
  */
 public class BSTree {
-    private int value;
-    private String color;
-    private BSTree left, right;
+    public int value;
+    public String color;
+    public BSTree left, right;
 
     public BSTree(int value, String color) {
         this.value = value;
@@ -21,14 +21,6 @@ public class BSTree {
     public void update(@NonNull BSTree tree) {
         this.color = tree.color;
         this.value = tree.value;
-    }
-
-    /**
-     * Set the value of the current node
-     * @param value New value
-     */
-    public void setValue(int value) {
-        this.value = value;
     }
 
     /**
@@ -56,38 +48,11 @@ public class BSTree {
     }
 
     /**
-     * Set the {@link BSTree} left node
-     */
-    public void setLeft(BSTree left) {
-        this.left = left;
-    }
-
-    /**
      * Get the {@link BSTree} right node
      * @return Get the {@link BSTree} right node
      */
     public BSTree getRight() {
         return right;
-    }
-
-    /**
-     * Set the {@link BSTree} right node
-     */
-    public void setRight(BSTree right) {
-        this.right = right;
-    }
-
-    /**
-     * Method to get a inorder representation of the tree as String
-     * @param node Root node
-     * @param builder Builder to create the string representation
-     */
-    public static void inorder(BSTree node, StringBuilder builder) {
-        if (null == node) return;
-
-        inorder(node.left, builder);
-        builder.append(node.value).append(",");
-        inorder(node.right, builder);
     }
 
     /**

@@ -6,8 +6,8 @@
 jclass tree_cls;
 
 jmethodID parser_length, parser_value, parser_color;
-jmethodID tree_init, tree_get_left, tree_get_right, tree_set_left, tree_set_right, tree_value,
-    tree_update, tree_color;
+jmethodID tree_init, tree_update;
+jfieldID tree_value, tree_color, tree_left, tree_right;
 
 void init(JNIEnv* env) {
     jclass parser_cls = env->FindClass("com/miniclip/bstree/util/JSONParser");
@@ -18,19 +18,18 @@ void init(JNIEnv* env) {
     parser_color = env->GetMethodID(parser_cls, "getColor", "(I)Ljava/lang/String;");
 
     tree_init = env->GetMethodID(tree_cls, "<init>", "(ILjava/lang/String;)V");
-    tree_value = env->GetMethodID(tree_cls, "getValue", "()I");
-    tree_color = env->GetMethodID(tree_cls, "getColor", "()Ljava/lang/String;");
+    tree_value = env->GetFieldID(tree_cls, "value", "I");
+    tree_color = env->GetFieldID(tree_cls, "color", "Ljava/lang/String;");
+    tree_left = env->GetFieldID(tree_cls, "left", "Lcom/miniclip/bstree/entity/BSTree;");
+    tree_right = env->GetFieldID(tree_cls, "right", "Lcom/miniclip/bstree/entity/BSTree;");
+
     tree_update = env->GetMethodID(tree_cls, "update", "(Lcom/miniclip/bstree/entity/BSTree;)V");
-    tree_get_left = env->GetMethodID(tree_cls, "getLeft", "()Lcom/miniclip/bstree/entity/BSTree;");
-    tree_get_right = env->GetMethodID(tree_cls, "getRight", "()Lcom/miniclip/bstree/entity/BSTree;");
-    tree_set_left = env->GetMethodID(tree_cls, "setLeft","(Lcom/miniclip/bstree/entity/BSTree;)V");
-    tree_set_right = env->GetMethodID(tree_cls, "setRight","(Lcom/miniclip/bstree/entity/BSTree;)V");
 }
 
 jobject getNode(jobject node, int value, JNIEnv *env) {
-    jobject left = env->CallObjectMethod(node, tree_get_left);
-    jobject right = env->CallObjectMethod(node, tree_get_right);
-    jint node_val = env->CallIntMethod(node, tree_value);
+    jobject left = env->GetObjectField(node, tree_left);
+    jobject right = env->GetObjectField(node, tree_right);
+    jint node_val = env->GetIntField(node, tree_value);
 
     // Return if already exists
     if (value == node_val) {
@@ -59,16 +58,16 @@ createNodes(int length, int currentItem, JNIEnv *env, jobject parser, jobject ro
     jobject node = env->NewObject(tree_cls, tree_init, value, color);
 
     jobject obj = getNode(root, value, env);
-    jint obj_val = env->CallIntMethod(obj, tree_value);
+    jint obj_val = env->GetIntField(obj, tree_value);
 
     // Skip if already exists
     if (value != obj_val) {
         if (value <= obj_val) {
             // Add to left
-            env->CallVoidMethod(obj, tree_set_left, node);
+            env->SetObjectField(obj, tree_left, node);
         } else {
             // Add to right
-            env->CallVoidMethod(obj, tree_set_right, node);
+            env->SetObjectField(obj, tree_right, node);
         }
     }
 
@@ -142,10 +141,10 @@ Java_com_miniclip_bstree_MainActivity_addNodes(
  */
 jobject minValue(jobject root, JNIEnv* env) {
     jobject node = root;
-    jobject left = env->CallObjectMethod(root, tree_get_left);
+    jobject left = env->GetObjectField(root, tree_left);
     while (left != nullptr) {
         node = left;
-        left = env->CallObjectMethod(left, tree_get_left);
+        left = env->GetObjectField(left, tree_left);
     }
 
     return node;
@@ -154,15 +153,15 @@ jobject minValue(jobject root, JNIEnv* env) {
 jobject removeVal(jobject root, int value, JNIEnv* env) {
     if (nullptr == root) return root;
 
-    int root_val = env->CallIntMethod(root, tree_value);
-    jobject left = env->CallObjectMethod(root, tree_get_left);
-    jobject right = env->CallObjectMethod(root, tree_get_right);
+    int root_val = env->GetIntField(root, tree_value);
+    jobject left = env->GetObjectField(root, tree_left);
+    jobject right = env->GetObjectField(root, tree_right);
     if (value < root_val) {
         jobject node = removeVal(left, value, env);
-        env->CallVoidMethod(root, tree_set_left, node);
+        env->SetObjectField(root, tree_left, node);
     } else if (value > root_val) {
         jobject node = removeVal(right, value, env);
-        env->CallVoidMethod(root, tree_set_right, node);
+        env->SetObjectField(root, tree_right, node);
     } else {
         if (nullptr == left) {
             return right;
@@ -171,9 +170,9 @@ jobject removeVal(jobject root, int value, JNIEnv* env) {
         } else {
             jobject minVal = minValue(right, env);
             env->CallVoidMethod(root, tree_update, minVal);
-            int inorder_key = env->CallIntMethod(minVal, tree_value);
+            int inorder_key = env->GetIntField(minVal, tree_value);
             jobject node = removeVal(right, inorder_key, env);
-            env->CallVoidMethod(root, tree_set_right, node);
+            env->SetObjectField(root, tree_right, node);
         }
     }
 
@@ -189,18 +188,18 @@ bool compareString(jstring str1, jstring str2, JNIEnv* env) {
 jobject removeColor(jobject root, jobject node, jstring color, JNIEnv* env) {
     if (nullptr == node) return node;
 
-    int root_val = env->CallIntMethod(node, tree_value);
-    jstring root_color = (jstring) env->CallObjectMethod(node, tree_color);
-    jobject left = env->CallObjectMethod(node, tree_get_left);
-    jobject right = env->CallObjectMethod(node, tree_get_right);
+    int root_val = env->GetIntField(node, tree_value);
+    jstring root_color = (jstring) env->GetObjectField(node, tree_color);
+    jobject left = env->GetObjectField(node, tree_left);
+    jobject right = env->GetObjectField(node, tree_right);
 
     // Color match found
     while (compareString(color, root_color, env)) {
         root = removeVal(root, root_val, env);
 
         if (root != nullptr) {
-            root_color = (jstring) env->CallObjectMethod(root, tree_color);
-            root_val = env->CallIntMethod(root, tree_value);
+            root_color = (jstring) env->GetObjectField(root, tree_color);
+            root_val = env->GetIntField(root, tree_value);
         } else {
             root_color = env->NewStringUTF("");
         }
@@ -247,10 +246,10 @@ Java_com_miniclip_bstree_MainActivity_removeColor(
 void statePopulation(JNIEnv* env, jobject root, jobject state, jmethodID put) {
     if (nullptr == root) return;
 
-    int root_val = env->CallIntMethod(root, tree_value);
-    jstring root_color = (jstring) env->CallObjectMethod(root, tree_color);
-    jobject left = env->CallObjectMethod(root, tree_get_left);
-    jobject right = env->CallObjectMethod(root, tree_get_right);
+    int root_val = env->GetIntField(root, tree_value);
+    jstring root_color = (jstring) env->GetObjectField(root, tree_color);
+    jobject left = env->GetObjectField(root, tree_left);
+    jobject right = env->GetObjectField(root, tree_right);
 
     statePopulation(env, left, state, put);
 
