@@ -39,6 +39,7 @@ by pressing the required button.
 You can also view the rendered tree in 2 ways :
 1. Inorder (Click on any node to see it and it's child nodes)
 2. Tree View (Typical tree view)
+
 This can be achieved by using the menu.
 
 ### Create and Add
